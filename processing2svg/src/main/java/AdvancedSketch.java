@@ -1,6 +1,9 @@
 
 import java.awt.Dimension;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 
@@ -13,14 +16,11 @@ import org.w3c.dom.Document;
 import processing.awt.PGraphicsJava2D;
 import processing.core.*;
 
-public class MyProcessingSketch extends PApplet {
+public class AdvancedSketch extends PApplet {
 
 	public static void main(String[] args) {
-		PApplet.main(new String[] {"MyProcessingSketch"});
+		PApplet.main(new String[] {"AdvancedSketch"});
 	}
-
-	//	An array of stripes
-	Stripe[] stripes = new Stripe[50];
 
 	@Override
 	public void settings() {
@@ -34,11 +34,6 @@ public class MyProcessingSketch extends PApplet {
 
 	@Override
 	public void setup() {
-
-		// Initialize all "stripes"
-		for (int i = 0; i < stripes.length; i++) {
-			stripes[i] = new Stripe(this);
-		}
 
 		// Get a DOMImplementation.
 		DOMImplementation domImpl =
@@ -67,28 +62,51 @@ public class MyProcessingSketch extends PApplet {
 		pgj.beginDraw();
 		pgj.g2 = svgGenerator;
 		
-		pgj.background(51);
-		pgj.noFill();
-		pgj.stroke(255);
-		pgj.ellipse(30, 30, 60, 60);
+		int dim = pgj.width/2;
+		pgj.background(0);
+		pgj.colorMode(HSB, 360, 100, 100);
+		pgj.noStroke();
+		pgj.ellipseMode(RADIUS);
+
+		drawGradient(dim, dim, pgj.height/2);
 		
 		
 		pgj.endDraw();
 
-		// Finally, stream out SVG to the standard output using
-		// UTF-8 encoding.
-	    boolean useCSS = false; // we want to use CSS style attributes
+		// Finally, stream out SVG to a string
+	    boolean useCSS = true; // we want to use CSS style attributes
 	    
+	    String svg = "";
 	    try {
-	    	Writer out = new OutputStreamWriter(System.out, "UTF-8");
+	    	Writer out = new StringWriter();
 			svgGenerator.stream(out, useCSS);
+			svg = out.toString();
 		} catch (SVGGraphics2DIOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
+	    
+	    System.out.print(svg);
+	    
+	    
+	    
+	    try{
+	        PrintWriter writer = new PrintWriter("AdvancedSketch.svg", "UTF-8");
+	        writer.print(svg);
+	        writer.close();
+	    } catch (IOException e) {
+	       // do something
+	    }
 	    System.exit(0);
 	}
+	
+	void drawGradient(int dim, float x, float y) {
+		  int radius = dim/2;
+		  float h = random(0, 360);
+		  for (int r = radius; r > 0; --r) {
+		    pgj.fill(h, 90, 90);
+		    pgj.ellipse(x, y, r, r);
+		    h = (h + 1) % 360;
+		  }
+		}
 }
