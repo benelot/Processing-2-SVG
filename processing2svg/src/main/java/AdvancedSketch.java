@@ -1,112 +1,57 @@
 
-import java.awt.Dimension;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
+import java.util.Random;
 
-import org.apache.batik.dom.GenericDOMImplementation;
-import org.apache.batik.svggen.SVGGraphics2D;
-import org.apache.batik.svggen.SVGGraphics2DIOException;
-import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.Document;
-
-import processing.awt.PGraphicsJava2D;
 import processing.core.*;
 
-public class AdvancedSketch extends PApplet {
 
-	public static void main(String[] args) {
-		PApplet.main(new String[] {"AdvancedSketch"});
-	}
-
-	@Override
-	public void settings() {
-	}
-
-	PGraphics pg;
+public class AdvancedSketch extends ProcessingDrawer{
 	
-	PGraphicsJava2D pgj;
+	Random r = new Random();
 	
-	SVGGraphics2D svgGenerator;
-
-	@Override
-	public void setup() {
-
-		// Get a DOMImplementation.
-		DOMImplementation domImpl =
-				GenericDOMImplementation.getDOMImplementation();
-
-		// Create an instance of org.w3c.dom.Document.
-		String svgNS = "http://www.w3.org/2000/svg";
-		Document document = domImpl.createDocument(svgNS, "svg", null);
-
-		// Create an instance of the SVG Generator.
-		svgGenerator = new SVGGraphics2D(document);
-		
-		int width = 400;
-		int height = 400;
-
-		svgGenerator.setSVGCanvasSize(new Dimension(width, height));
-		pg = createGraphics(width, height, JAVA2D);
-
-		pgj = (PGraphicsJava2D) pg;
+	public AdvancedSketch(){
+		super();
 	}
 
+	public AdvancedSketch(int width, int height) {
+		super(width, height);
+	}
 
 	@Override
-	public void draw() {
+	public void paintCanvas() {
 
-		pgj.beginDraw();
-		pgj.g2 = svgGenerator;
-		
-		int dim = pgj.width/2;
-		pgj.background(0);
-		pgj.colorMode(HSB, 360, 100, 100);
-		pgj.noStroke();
-		pgj.ellipseMode(RADIUS);
+		int dim = getCanvas().width/2;
+		getCanvas().background(0);
+		getCanvas().colorMode(PApplet.HSB, 360, 100, 100);
+		getCanvas().noStroke();
+		getCanvas().ellipseMode(PApplet.RADIUS);
 
-		drawGradient(dim, dim, pgj.height/2);
-		
-		
-		pgj.endDraw();
-
-		// Finally, stream out SVG to a string
-	    boolean useCSS = true; // we want to use CSS style attributes
-	    
-	    String svg = "";
-	    try {
-	    	Writer out = new StringWriter();
-			svgGenerator.stream(out, useCSS);
-			svg = out.toString();
-		} catch (SVGGraphics2DIOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	    
-	    System.out.print(svg);
-	    
-	    
-	    
-	    try{
-	        PrintWriter writer = new PrintWriter("AdvancedSketch.svg", "UTF-8");
-	        writer.print(svg);
-	        writer.close();
-	    } catch (IOException e) {
-	       // do something
-	    }
-	    System.exit(0);
+		drawGradient(dim, dim, getCanvas().height/2);	
 	}
 	
 	void drawGradient(int dim, float x, float y) {
 		  int radius = dim/2;
-		  float h = random(0, 360);
+		  float h = r.nextInt(360);
 		  for (int r = radius; r > 0; --r) {
-		    pgj.fill(h, 90, 90);
-		    pgj.ellipse(x, y, r, r);
+		    getCanvas().fill(h, 90, 90);
+		    getCanvas().ellipse(x, y, r, r);
 		    h = (h + 1) % 360;
 		  }
 		}
+	
+	public static void main(String[] args){
+		AdvancedSketch as = new AdvancedSketch(400, 400);
+		as.setup();
+		as.draw();
+		System.out.print(as.getSVG());
+		
+		try{
+	        PrintWriter writer = new PrintWriter("AdvancedSketch.svg", "UTF-8");
+	        writer.print(as.getSVG());
+	        writer.close();
+	    } catch (IOException e) {
+	       // do something
+	    }
+	}
 }
