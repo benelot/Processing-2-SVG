@@ -1,5 +1,9 @@
+import java.util.Random;
+
 
 public class SimpleSketch extends ProcessingDrawer{
+	
+	Random r = new Random();
 	
 	public SimpleSketch(){
 		super();
@@ -14,8 +18,11 @@ public class SimpleSketch extends ProcessingDrawer{
 
 		getCanvas().background(51);
 		getCanvas().noFill();
-		getCanvas().stroke(255);
-		getCanvas().ellipse(30, 30, 60, 60);		
+
+		for(int i = 0; i < 30; i++){
+			getCanvas().stroke(r.nextInt(255), r.nextInt(255), r.nextInt(255));
+			getCanvas().ellipse(r.nextInt(width), r.nextInt(width), 60, 60);
+		}
 	}
 	
 	public static void main(String[] args){
